@@ -49,8 +49,19 @@ export default function Home() {
     <div className="flex flex-col items-center p-4">
       <h1 className="text-2xl font-bold">Audio Transcription</h1>
       <div className="mt-4">
-        <button className="btn btn-primary">Record</button>
+        <button
+          className="btn btn-primary"
+          onClick={recording ? stopRecording : startRecording}
+        >
+          {recording ? "Stop recording" : "Start recording"}
+        </button>
       </div>
+      {audioURL && <audio src={audioURL} controls className="mt-4" />}
+      {transcription && (
+        <div className="mt-4 bg-gray-200 p-2 rounded">
+          <strong>Transcription:</strong> {transcription}
+        </div>
+      )}
     </div>
   );
 }
