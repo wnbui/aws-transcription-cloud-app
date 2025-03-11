@@ -8,7 +8,7 @@ export async function POST(req: Request) {
         const file = formData.get("audio") as Blob;
 
         if (!file) { 
-            return NextResponse.json({error: "No file uploaded"}, {status: 400}); 
+            return NextResponse.json({ error: "No file uploaded" }, { status: 400 }); 
         }
 
         const buffer = await file.arrayBuffer();
@@ -40,7 +40,12 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Missing job_id" }, { status: 400 });
         }
 
+        // Fetch transcription result from AWS API Gateway
         const response = await fetch(`${API_URL}?action=fetch&job_id=${jobId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch transcription status");
+        }
 
     } catch (error) {
         return NextResponse.json({ error: (error as Error).message}, {status: 500 });
