@@ -5,6 +5,7 @@ export default function Home() {
   const [recording, setRecording] = useState(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [transcription, setTranscription] = useState<string | null>(null);
+  const [jobId, setJobId] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunks: BlobPart[] = [];
 
@@ -45,23 +46,29 @@ export default function Home() {
     }
   };
 
+  const fetchTranscription = async () => {
+    if (!jobId) return console.log("No transcription");
+    const response = await fetch(`/api/transcribe?job_id=${jobId}`);
+    const data = await response.json();
+    setTranscription(data.transcriptUrl || "Processing...");
+  };
+
   return (
     <div className="flex flex-col items-center p-4">
       <h1 className="text-2xl font-bold">Audio Transcription</h1>
-      <div className="mt-4">
-        <button
-          className="btn btn-primary"
-          onClick={recording ? stopRecording : startRecording}
-        >
-          {recording ? "Stop recording" : "Start recording"}
-        </button>
-      </div>
+      <button
+        className="btn btn-primary"
+        onClick={recording ? stopRecording : startRecording}
+      >
+        {recording ? "Stop recording" : "Start recording"}
+      </button>
       {audioURL && <audio src={audioURL} controls className="mt-4" />}
-      {transcription && (
-        <div className="mt-4 bg-gray-200 p-2 rounded">
-          <strong>Transcription:</strong> {transcription}
-        </div>
+      {jobId && (
+        <button className="btn btn-primary" onClick={fetchTranscription}>
+          Transcription
+        </button>
       )}
+      {transcription && <div>{transcription}</div>}
     </div>
   );
 }
